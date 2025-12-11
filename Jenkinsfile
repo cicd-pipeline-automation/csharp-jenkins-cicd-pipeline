@@ -39,20 +39,11 @@ pipeline {
     environment {
         PROJECT_NAME      = "Sample Flask Login"
         NOTIFY_EMAIL      = "devopsuser8413@gmail.com"   // Change if needed
+        DOTNET_PATH       = "C:\\Program Files\\dotnet\\dotnet.exe"
         INNO_SETUP_PATH   = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"
     }
 
     stages {
-        // --------------------------------------------------------------------
-        // 🔢Verify Dotnet version
-        // --------------------------------------------------------------------
-        stage('Verify Dotnet') {
-            steps {
-                bat 'where dotnet'
-                bat 'dotnet --info'
-            }
-        }
-
         // --------------------------------------------------------------------
         // 🔢 Version Handling
         // --------------------------------------------------------------------
@@ -112,13 +103,17 @@ pipeline {
             steps {
                 echo "⚙️ Restoring, building, and publishing the application..."
 
-                // Show installed dotnet version (debugging / verification)
-                bat 'dotnet --version'
+                // Verify dotnet
+                bat "\"%DOTNET_PATH%\" --version"
 
-                // Restore, build, and publish using .NET SDK
-                bat 'dotnet restore src\\SampleFlaskLogin.sln'
-                bat 'dotnet build src\\SampleFlaskLogin.sln -c Release'
-                bat 'dotnet publish src\\SampleFlaskLogin\\ -c Release -o publish'
+                // Restore
+                bat "\"%DOTNET_PATH%\" restore src\\SampleFlaskLogin.sln"
+
+                // Build
+                bat "\"%DOTNET_PATH%\" build src\\SampleFlaskLogin.sln -c Release"
+
+                // Publish
+                bat "\"%DOTNET_PATH%\" publish src\\SampleFlaskLogin\\ -c Release -o publish"
             }
         }
 
