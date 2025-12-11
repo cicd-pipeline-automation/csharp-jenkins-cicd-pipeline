@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Sample Flask Login</title>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+    <!-- ============================================================
+         🔷 Header Navigation Bar
+         ============================================================ -->
+    <header>
+        <div class="navbar">
+            <div class="navbar-brand">
+                Sample Flask Login (C#)
+            </div>
+
+            <div class="navbar-links">
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <span>Hello, @User.Identity.Name!</span> |
+                    <a asp-controller="Home" asp-action="Index">Home</a> |
+                    <a asp-controller="Account" asp-action="Logout">Logout</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">Login</a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         📦 Main Content
+         ============================================================ -->
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <!-- ============================================================
+         📌 Footer
+         ============================================================ -->
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Sample Flask Login</p>
+    </footer>
+</body>
+</html>

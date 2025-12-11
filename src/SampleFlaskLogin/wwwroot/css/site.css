@@ -1,0 +1,74 @@
+/* ============================================================
+   🌐 Global Styles
+   ============================================================ */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+/* ============================================================
+   🔷 Header & Navigation
+   ============================================================ */
+header {
+    background-color: #1f2937;
+    color: #fff;
+    padding: 10px 20px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+/* ============================================================
+   📦 Page Container
+   ============================================================ */
+.container {
+    padding: 20px;
+}
+
+/* ============================================================
+   📝 Form Elements
+   ============================================================ */
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-control {
+    width: 250px;
+    padding: 5px;
+}
+
+.btn {
+    padding: 6px 14px;
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #1d4ed8;
+}
+
+.text-danger {
+    color: #dc2626;
+}
+
+/* ============================================================
+   📌 Footer
+   ============================================================ */
+footer {
+    margin-top: 30px;
+    padding: 10px 20px;
+    text-align: center;
+    background-color: #e5e7eb;
+}

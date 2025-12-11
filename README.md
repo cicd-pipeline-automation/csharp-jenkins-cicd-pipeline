@@ -1,2 +1,2 @@
-# csharp-jenkins-cicd-pipeline
-C Sharp Flask Login Jenkins CI/CD Pipeline
+# Sample Flask Login (C# ASP.NET Core)
+See documentation...

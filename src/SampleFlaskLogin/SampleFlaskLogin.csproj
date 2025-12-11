@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- ===============================================================
+       📦 Project Configuration
+       ASP.NET Core Web Application (.NET 6)
+       =============================================================== -->
+  <PropertyGroup>
+    <!-- Target Framework -->
+    <TargetFramework>net6.0</TargetFramework>
+
+    <!-- Enable nullable reference types -->
+    <Nullable>enable</Nullable>
+
+    <!-- Enable automatic common namespace imports -->
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Output assembly name -->
+    <AssemblyName>SampleFlaskLogin</AssemblyName>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,4 @@
+Sample Flask Login
+Copyright (c) Your Company
+
+You can put your license terms here.
