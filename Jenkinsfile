@@ -134,19 +134,23 @@ pipeline {
         // --------------------------------------------------------------------
         stage('Generate Inno Setup Build Config') {
             steps {
-                script {
-                    echo "📝 Generating dynamic Inno Setup build configuration..."
+                echo "📝 Generating Inno Setup build configuration..."
 
-                    // This file is included by Inno Setup and passes dynamic values
-                    def buildConfig = """
-                    #define MyAppVersion \\"${env.NEW_VERSION}\\"
-                    #define MyOutputBaseName \\"${env.NEW_VERSION}\\"
-                    #include \\"installer_script.iss\\"
-                    """
+                writeFile file: 'installer/build_config.iss', text: """
+                [Setup]
+                AppName=SampleFlaskLogin
+                AppVersion=${FULL_VERSION}
+                DefaultDirName={pf}\\SampleFlaskLogin
+                DefaultGroupName=SampleFlaskLogin
+                OutputDir=..\\result
+                OutputBaseFilename=SampleFlaskLoginInstaller
 
-                    writeFile file: 'installer/build_config.iss', text: buildConfig
-                    echo "✅ Inno Setup build_config.iss created under installer/"
-                }
+                [Files]
+                Source: "publish/*"; DestDir: "{app}"; Flags: recursesubdirs
+
+                [Icons]
+                Name: "{group}\\SampleFlaskLogin"; Filename: "{app}\\SampleFlaskLogin.exe"
+                """
             }
         }
 
