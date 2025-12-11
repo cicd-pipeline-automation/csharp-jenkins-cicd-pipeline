@@ -146,7 +146,7 @@ pipeline {
         OutputBaseFilename=SampleFlaskLoginInstaller_${env.NEW_VERSION}
 
         [Files]
-        Source: "publish/*"; DestDir: "{app}"; Flags: recursesubdirs
+        Source: "..\\publish\\*"; DestDir: "{app}"; Flags: recursesubdirs
 
         [Icons]
         Name: "{group}\\SampleFlaskLogin"; Filename: "{app}\\SampleFlaskLogin.exe"
