@@ -9,19 +9,27 @@ pipeline {
     agent any
 
     // ------------------------------------------------------------------------
+    // ⚙️ Pipeline Options
+    // ------------------------------------------------------------------------
+    options {
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    // ------------------------------------------------------------------------
     // 🔧 Pipeline Parameters
     // ------------------------------------------------------------------------
     parameters {
         choice(
             name: 'VERSION_TYPE',
             choices: ['Alpha', 'Beta', 'Patch', 'Minor', 'Major'],
-            description: 'Select Version Type'
+            description: 'Select Version Type for release naming and version bumping'
         )
 
         choice(
             name: 'ENVIRONMENT',
             choices: ['Dev', 'QA', 'Prod'],
-            description: 'Select Deployment Environment'
+            description: 'Select target environment (for reporting/metadata)'
         )
     }
 
@@ -29,19 +37,15 @@ pipeline {
     // 🌍 Global Environment Variables
     // ------------------------------------------------------------------------
     environment {
-        PROJECT_NAME = "Sample Flask Login"
+        PROJECT_NAME      = "Sample Flask Login"
+        NOTIFY_EMAIL      = "devopsuser8413@gmail.com"   // Change if needed
+        INNO_SETUP_PATH   = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"
     }
 
     stages {
 
         // --------------------------------------------------------------------
-        stage('Checkout Source Code') {
-            steps {
-                echo "📥 Checking out repository..."
-                checkout scm
-            }
-        }
-
+        // 🔢 Version Handling
         // --------------------------------------------------------------------
         stage('Read & Bump Version') {
             steps {
@@ -50,6 +54,7 @@ pipeline {
 
                     // Create version file if not present
                     if (!fileExists('version.txt')) {
+                        echo "version.txt not found. Initializing with 1.0.0"
                         writeFile file: 'version.txt', text: '1.0.0'
                     }
 
@@ -80,62 +85,80 @@ pipeline {
                     // Construct new version strings
                     def numeric = "${major}.${minor}.${patch}"
                     env.NEW_VERSION_NUMERIC = numeric
-                    env.NEW_VERSION = "v${numeric}_${params.VERSION_TYPE}"
+                    env.NEW_VERSION         = "v${numeric}_${params.VERSION_TYPE}"
 
                     // Update version file
                     writeFile file: 'version.txt', text: numeric
 
-                    echo "Updated Version (numeric): ${numeric}"
-                    echo "Full Version: ${env.NEW_VERSION}"
+                    echo "✅ Updated Version (numeric): ${numeric}"
+                    echo "🏷️ Full Version Label   : ${env.NEW_VERSION}"
                 }
             }
         }
 
         // --------------------------------------------------------------------
+        // 🧱 Restore, Build & Publish
+        // --------------------------------------------------------------------
         stage('Restore, Build & Publish') {
             steps {
                 echo "⚙️ Restoring, building, and publishing the application..."
-                sh """
-                    dotnet restore src/SampleFlaskLogin.sln
-                    dotnet build src/SampleFlaskLogin.sln -c Release
-                    dotnet publish src/SampleFlaskLogin/ -c Release -o publish/
-                """
+
+                // Show installed dotnet version (debugging / verification)
+                bat 'dotnet --version'
+
+                // Restore, build, and publish using .NET SDK
+                bat 'dotnet restore src\\SampleFlaskLogin.sln'
+                bat 'dotnet build src\\SampleFlaskLogin.sln -c Release'
+                bat 'dotnet publish src\\SampleFlaskLogin\\ -c Release -o publish'
             }
         }
 
         // --------------------------------------------------------------------
+        // 📁 Prepare Output Folders
+        // --------------------------------------------------------------------
         stage('Prepare Output Folders') {
             steps {
                 echo "📁 Preparing result folder..."
-                sh 'mkdir -p result'
+                bat '''
+                    if not exist result mkdir result
+                '''
             }
         }
 
+        // --------------------------------------------------------------------
+        // 📝 Generate Inno Setup Build Config
         // --------------------------------------------------------------------
         stage('Generate Inno Setup Build Config') {
             steps {
                 script {
                     echo "📝 Generating dynamic Inno Setup build configuration..."
 
+                    // This file is included by Inno Setup and passes dynamic values
                     def buildConfig = """
-#define MyAppVersion "${env.NEW_VERSION}"
-#define MyOutputFile "result\\\\${env.NEW_VERSION}.exe"
-#include "installer_script.iss"
-"""
+                    #define MyAppVersion \\"${env.NEW_VERSION}\\"
+                    #define MyOutputBaseName \\"${env.NEW_VERSION}\\"
+                    #include \\"installer_script.iss\\"
+                    """
 
                     writeFile file: 'installer/build_config.iss', text: buildConfig
+                    echo "✅ Inno Setup build_config.iss created under installer/"
                 }
             }
         }
 
         // --------------------------------------------------------------------
+        // 🛠️ Compile Installer (Inno Setup)
+        // --------------------------------------------------------------------
         stage('Compile Installer (Inno Setup)') {
             steps {
                 echo "🛠️ Running Inno Setup Compiler..."
-                bat "\"C:\\\\Program Files (x86)\\\\Inno Setup 6\\\\ISCC.exe\" installer\\\\build_config.iss"
+
+                bat "\"${INNO_SETUP_PATH}\" installer\\build_config.iss"
             }
         }
 
+        // --------------------------------------------------------------------
+        // 📦 Archive Build Artifact
         // --------------------------------------------------------------------
         stage('Archive Build Artifact') {
             steps {
@@ -145,27 +168,30 @@ pipeline {
         }
 
         // --------------------------------------------------------------------
+        // 📧 Send Email Notification
+        // --------------------------------------------------------------------
         stage('Send Email Notification') {
             steps {
                 echo "📧 Sending email notification with build artifacts..."
                 emailext(
-                    subject: "Build Complete: ${env.PROJECT_NAME} - ${env.NEW_VERSION}",
+                    subject: "✅ Build Complete: ${env.PROJECT_NAME} - ${env.NEW_VERSION}",
                     body: """
-Hello Team,
+                            Hello Team,
 
-The build has completed successfully.
+                            The build has completed successfully. 🎉
 
-**Project:** ${env.PROJECT_NAME}  
-**Environment:** ${params.ENVIRONMENT}  
-**Version:** ${env.NEW_VERSION}  
+                            Project     : ${env.PROJECT_NAME}
+                            Environment : ${params.ENVIRONMENT}
+                            Version     : ${env.NEW_VERSION}
 
-Download the installer:  
-${BUILD_URL}artifact/result/
+                            You can download the installer from Jenkins:
 
-Regards,  
-Jenkins CI/CD
-""",
-                    to: 'devopsuser8413@gmail.com',
+                            ${BUILD_URL}artifact/result/
+
+                            Regards,
+                            Jenkins CI/CD
+                            """,
+                    to: "${env.NOTIFY_EMAIL}",
                     attachmentsPattern: 'result/*.exe'
                 )
             }
@@ -177,18 +203,23 @@ Jenkins CI/CD
     // ------------------------------------------------------------------------
     post {
         failure {
+            echo "❌ Build failed. Sending failure notification email..."
             emailext(
                 subject: "❌ BUILD FAILED - ${env.PROJECT_NAME}",
                 body: """
-The build has FAILED.
+                        The build has *FAILED*. ❗
 
-Please review the build logs:  
-${BUILD_URL}
+                        Please review the build logs here:
 
-Regards,  
-Jenkins CI/CD
-""",
-                to: 'devopsuser8413@gmail.com'
+                        ${BUILD_URL}
+
+                        Project     : ${env.PROJECT_NAME}
+                        Environment : ${params.ENVIRONMENT}
+
+                        Regards,
+                        Jenkins CI/CD
+                        """,
+                to: "${env.NOTIFY_EMAIL}"
             )
         }
     }
