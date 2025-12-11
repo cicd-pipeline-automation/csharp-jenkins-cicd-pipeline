@@ -44,6 +44,11 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
         // --------------------------------------------------------------------
         // 🔢 Version Handling
         // --------------------------------------------------------------------
@@ -93,6 +98,12 @@ pipeline {
                     echo "✅ Updated Version (numeric): ${numeric}"
                     echo "🏷️ Full Version Label   : ${env.NEW_VERSION}"
                 }
+            }
+        }
+
+        stage('DEBUG View File') {
+            steps {
+                bat 'type src\\SampleFlaskLogin\\Views\\Shared\\_Layout.cshtml'
             }
         }
 
