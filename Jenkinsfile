@@ -102,6 +102,12 @@ pipeline {
             }
         }
 
+        stage('DEBUG Imports') {
+            steps {
+                bat 'type src\\SampleFlaskLogin\\Views\\_ViewImports.cshtml'
+            }
+        }
+
         // --------------------------------------------------------------------
         // 🧱 Restore, Build & Publish
         // --------------------------------------------------------------------
