@@ -137,20 +137,20 @@ pipeline {
                 echo "📝 Generating Inno Setup build configuration..."
 
                 writeFile file: 'installer/build_config.iss', text: """
-                [Setup]
-                AppName=SampleFlaskLogin
-                AppVersion=${FULL_VERSION}
-                DefaultDirName={pf}\\SampleFlaskLogin
-                DefaultGroupName=SampleFlaskLogin
-                OutputDir=..\\result
-                OutputBaseFilename=SampleFlaskLoginInstaller
+        [Setup]
+        AppName=SampleFlaskLogin
+        AppVersion=${env.NEW_VERSION}
+        DefaultDirName={pf}\\SampleFlaskLogin
+        DefaultGroupName=SampleFlaskLogin
+        OutputDir=..\\result
+        OutputBaseFilename=SampleFlaskLoginInstaller_${env.NEW_VERSION}
 
-                [Files]
-                Source: "publish/*"; DestDir: "{app}"; Flags: recursesubdirs
+        [Files]
+        Source: "publish/*"; DestDir: "{app}"; Flags: recursesubdirs
 
-                [Icons]
-                Name: "{group}\\SampleFlaskLogin"; Filename: "{app}\\SampleFlaskLogin.exe"
-                """
+        [Icons]
+        Name: "{group}\\SampleFlaskLogin"; Filename: "{app}\\SampleFlaskLogin.exe"
+        """
             }
         }
 
