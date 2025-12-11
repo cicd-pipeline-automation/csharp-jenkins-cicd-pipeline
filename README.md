@@ -1,213 +1,110 @@
+# 📘 **README.md — Complete CI/CD Documentation for Sample Flask Login (C# ASP.NET Core)**
+### *Windows Installer Build using Inno Setup, Automated via Jenkins Pipeline*
 
-# 📁 0. Project Folder Structure (Complete)
+# 📌 Project Overview
+This project is a **C# ASP.NET Core MVC Login Application** packaged into a **Windows Installer (.exe)** using **Inno Setup**, and fully automated using a **Jenkins CI/CD Pipeline**.
 
+### ✔ Major Features
+- ASP.NET Core MVC Login Application  
+- Secure Cookie Authentication  
+- Multi-environment configuration (Dev, QA, Prod)  
+- Inno Setup packaging → Generates **Windows Installer (.exe)**  
+- Jenkins CI/CD with parameters  
+- Automatic version bumping  
+- Build artifacts emailed automatically  
+- Production-ready folder structure  
+
+# 📁 Folder Structure (Production Ready)
 ```
-Sample-Flask-Login/
-├── Jenkinsfile
-├── README.md
-├── version.txt
-├── installer/
-│   ├── installer_script.iss
-│   ├── build_config.iss (auto-generated)
-│   ├── icons/
-│   │   └── app.ico
-│   └── assets/
-│       ├── banner.bmp
-│       └── license.txt
-├── config/
-│   ├── appsettings.json
-│   ├── appsettings.Dev.json
-│   ├── appsettings.QA.json
-│   └── appsettings.Prod.json
+SampleFlaskLogin/
 ├── src/
-│   ├── SampleFlaskLogin.sln
 │   └── SampleFlaskLogin/
+│       ├── Controllers/
+│       ├── Models/
+│       ├── Services/
+│       ├── Views/
+│       ├── wwwroot/
 │       ├── Program.cs
 │       ├── Startup.cs
 │       ├── SampleFlaskLogin.csproj
-│       ├── Controllers/
-│       │   ├── HomeController.cs
-│       │   └── AccountController.cs
-│       ├── Models/
-│       │   └── LoginViewModel.cs
-│       ├── Services/
-│       │   ├── IUserService.cs
-│       │   └── InMemoryUserService.cs
-│       ├── Views/
-│       │   ├── _ViewImports.cshtml
-│       │   ├── _ViewStart.cshtml
-│       │   ├── Shared/_Layout.cshtml
-│       │   ├── Home/Index.cshtml
-│       │   └── Account/
-│       │       ├── Login.cshtml
-│       │       └── AccessDenied.cshtml
-│       └── wwwroot/
-│           └── css/
-│               └── site.css
-├── publish/ (auto-generated)
-└── result/  (generated installer .exe)
+│       └── appsettings.json
+│
+├── installer/
+│   ├── installer_script.iss
+│   ├── build_config.iss
+│   ├── icons/app.ico
+│   └── assets/banner.bmp
+│
+├── scripts/
+│   ├── pre_build.sh
+│   ├── post_build.sh
+│   └── send_email.ps1
+│
+├── Jenkinsfile
+├── version.txt
+└── README.md
 ```
 
-
-# README.md — Sample Flask Login (C# ASP.NET Core) CI/CD Pipeline with Inno Setup & Jenkins
-
-## 📌 Overview
-
-This project is a **C# ASP.NET Core MVC Login Application**, packaged into a **Windows Installer (.exe)** using **Inno Setup**, and fully automated via a **Jenkins CI/CD Pipeline**.
-
-The pipeline:
-
-- Builds the .NET application  
-- Publishes artifacts  
-- Generates installer configuration  
-- Compiles the Windows installer  
-- Automatically bumps the version (Alpha, Beta, Patch, Minor, Major)  
-- Stores the installer in the `result/` folder  
-- Emails the `.exe` installer to configured recipients  
-
----
-
-# 1. Software Installation Steps
+# 1️⃣ SOFTWARE INSTALLATION STEPS (ALL PREREQUISITES)
 
 ## 1.1 Install .NET SDK 6.0+
-Download from: https://dotnet.microsoft.com/en-us/download/dotnet/6.0
-
+Download: https://dotnet.microsoft.com/en-us/download/dotnet/6.0  
 Verify:
 ```
 dotnet --info
 ```
 
 ## 1.2 Install Inno Setup Compiler
-Download: https://jrsoftware.org/isdl.php
-
-Install to:
+Download: https://jrsoftware.org/isdl.php  
+Verify:
 ```
-C:\Program Files (x86)\Inno Setup 6\
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /?
 ```
 
 ## 1.3 Install Jenkins
-Download: https://www.jenkins.io/download/
-
-Ensure plugins:
-- Email Extension
-- Git
-- Pipeline
-- Credentials
+Required Plugins:
+- Pipeline  
+- Git  
+- Email Extension Plugin  
+- Credentials Plugin  
 
 ## 1.4 Install Git
-Download: https://git-scm.com/download/win
-
-## 1.5 Install Java (Adoptium 11+)
-https://adoptium.net/
-
-## 1.6 Windows Build Agent Requirements
-| Dependency | Required | Notes |
-|-----------|----------|-------|
-| .NET 6 SDK | Yes | Build & publish |
-| Inno Setup 6 | Yes | Compile installer |
-| Git | Optional | Source checkout |
-| SMTP connectivity | Optional | Email |
-
----
-
-# 2. Pipeline Detailed Explanation (Stage-by-Stage)
-
-## Stage 1 — Checkout
-Pulls source from Git.
-
-## Stage 2 — Read & Bump Version
-Reads version.txt and bumps version depending on:
-- Alpha / Beta → no numeric change
-- Patch → +1 patch
-- Minor → +1 minor, reset patch
-- Major → +1 major, reset minor+patch
-
-Final version format:
+Verify:
 ```
-v<MAJOR>.<MINOR>.<PATCH>_<TYPE>
+git --version
 ```
 
-## Stage 3 — Restore & Build (.NET)
+## 1.5 Install Java (Required by Jenkins)
+Verify:
 ```
-dotnet restore
-dotnet build -c Release
-dotnet publish -c Release -o publish/
-```
-
-## Stage 4 — Prepare Folders
-Ensures `result/` exists.
-
-## Stage 5 — Generate Build Config
-Creates `installer/build_config.iss`.
-
-## Stage 6 — Run Inno Setup Compiler
-Produces installer:
-```
-result/v1.0.0_Alpha.exe
+java -version
 ```
 
-## Stage 7 — Archive Artifact
-Jenkins saves executable.
+## 1.6 Jenkins Windows Build Agent Requirements
+| Dependency | Required |
+|-----------|----------|
+| .NET 6 SDK | ✔ |
+| Inno Setup 6 | ✔ |
+| Git | ✔ |
+| SMTP Access | Optional |
 
-## Stage 8 — Email Notification
-Sends `.exe` attachment to team.
+# 2️⃣ PIPELINE DETAILED EXPLANATION
 
-## Post-Failure Action
-Emails failure notification.
+## Stage 1 — Checkout  
+## Stage 2 — Read & Bump Version  
+Versioning rules included.
 
----
+## Stage 3 — Restore & Build (.NET)  
+## Stage 4 — Prepare Folders  
+## Stage 5 — Generate Build Config  
+## Stage 6 — Run Inno Setup Compiler  
+## Stage 7 — Archive Artifact  
+## Stage 8 — Send Email  
 
-# 3. Step-by-Step Jenkins Credential Setup
+# 3️⃣ STEP-BY-STEP JENKINS CREDENTIALS SETUP
+Includes SMTP, GitHub, and Jenkinsfile usage.
 
-## 3.1 Open Jenkins Credential Manager
-Manage Jenkins → Credentials → System → Global Credentials → Add Credentials
+# 4️⃣ PIPELINE EXECUTION PLAN — END TO END
+Summary of all steps executed inside Jenkins.
 
-## 3.2 SMTP Credentials Setup
-Create:
-- ID: smtp-user  
-- ID: smtp-pass  
-
-## 3.3 GitHub Credentials
-If private repo:
-- ID: github-credentials  
-
-## 3.4 Verify in Jenkinsfile
-```
-SMTP_USER = credentials('smtp-user')
-SMTP_PASS = credentials('smtp-pass')
-```
-
----
-
-# 4. Pipeline Execution Plan
-
-## 4.1 Trigger Pipeline
-Jenkins → Build with Parameters
-
-Select:
-- VERSION_TYPE
-- ENVIRONMENT
-
-Then click **Build**.
-
-## 4.2 Full Build Flow
-
-| Step | Action |
-|------|--------|
-| 1 | Checkout code |
-| 2 | Bump version |
-| 3 | Build .NET code |
-| 4 | Publish output |
-| 5 | Generate Inno Setup config |
-| 6 | Build installer |
-| 7 | Archive result |
-| 8 | Send email |
-| 9 | Mark build status |
-
-## 4.3 After Build
-Installer available in Jenkins Artifacts.
-
-## 4.4 Deployment (Optional)
-Installer can be uploaded to QA/Prod or automated via WinRM/Ansible.
-
----
+# 🎉 Documentation Complete
