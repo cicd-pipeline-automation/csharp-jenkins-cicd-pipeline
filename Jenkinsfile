@@ -96,18 +96,6 @@ pipeline {
             }
         }
 
-        stage('DEBUG View File') {
-            steps {
-                bat 'type src\\SampleFlaskLogin\\Views\\Shared\\_Layout.cshtml'
-            }
-        }
-
-        stage('DEBUG Imports') {
-            steps {
-                bat 'type src\\SampleFlaskLogin\\Views\\_ViewImports.cshtml'
-            }
-        }
-
         // --------------------------------------------------------------------
         // 🧱 Restore, Build & Publish
         // --------------------------------------------------------------------

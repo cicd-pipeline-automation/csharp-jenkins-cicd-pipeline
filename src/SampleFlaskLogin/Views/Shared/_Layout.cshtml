@@ -1,16 +1,17 @@
+@{
+    Layout = null;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - Sample Flask Login</title>
-
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 
 <body>
-    <!-- ============================================================
-         Header Navigation Bar
-         ============================================================ -->
+
     <header>
         <div class="navbar">
             <div class="navbar-brand">
@@ -20,8 +21,10 @@
             <div class="navbar-links">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <span>Hello, @User.Identity.Name!</span> &#124;
-                    <a asp-controller="Home" asp-action="Index">Home</a> &#124;
+                    <span>Hello, @User.Identity.Name!</span>
+                    <text> | </text>
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <text> | </text>
                     <a asp-controller="Account" asp-action="Logout">Logout</a>
                 }
                 else
@@ -32,18 +35,13 @@
         </div>
     </header>
 
-    <!-- ============================================================
-         Main Content
-         ============================================================ -->
     <main class="container">
         @RenderBody()
     </main>
 
-    <!-- ============================================================
-         Footer
-         ============================================================ -->
     <footer>
         <p>&copy; @DateTime.Now.Year - Sample Flask Login</p>
     </footer>
+
 </body>
 </html>
