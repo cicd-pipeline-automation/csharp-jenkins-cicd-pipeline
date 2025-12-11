@@ -165,7 +165,7 @@ ${BUILD_URL}artifact/result/
 Regards,  
 Jenkins CI/CD
 """,
-                    to: 'team@example.com',
+                    to: 'devopsuser8413@gmail.com',
                     attachmentsPattern: 'result/*.exe'
                 )
             }
@@ -188,7 +188,7 @@ ${BUILD_URL}
 Regards,  
 Jenkins CI/CD
 """,
-                to: 'team@example.com'
+                to: 'devopsuser8413@gmail.com'
             )
         }
     }
