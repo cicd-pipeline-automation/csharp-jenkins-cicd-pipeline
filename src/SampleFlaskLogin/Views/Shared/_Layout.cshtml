@@ -20,8 +20,8 @@
             <div class="navbar-links">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <span>Hello, @User.Identity.Name!</span> |
-                    <a asp-controller="Home" asp-action="Index">Home</a> |
+                    <span>Hello, @User.Identity.Name!</span> &#124;
+                    <a asp-controller="Home" asp-action="Index">Home</a> &#124;
                     <a asp-controller="Account" asp-action="Logout">Logout</a>
                 }
                 else
