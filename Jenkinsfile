@@ -41,6 +41,21 @@ pipeline {
         NOTIFY_EMAIL      = "devopsuser8413@gmail.com"
         DOTNET_PATH       = "C:\\Program Files\\dotnet\\dotnet.exe"
         INNO_SETUP_PATH   = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"
+
+        // Gmail SMTP configuration
+        SMTP_SERVER = credentials('smtp-host')  
+        SMTP_PORT   = "587"
+
+        // Gmail credentials (App Password required)
+        SMTP_USERNAME = credentials('smtp-user')        // yourgmail@gmail.com
+        SMTP_PASSWORD = credentials('smtp-pass')    // Gmail App Password
+
+        // Email metadata (also from Jenkins credentials)
+        FROM_EMAIL = credentials('sender-email')                // yourgmail@gmail.com
+        TO_EMAILS  = credentials('receiver-email')                 // user1@company.com,user2@company.com
+
+        EMAIL_SUBJECT = "MasterDB Installer Build – SUCCESS"
+        EMAIL_BODY    = "Please find the MasterDB installer attached."
     }
 
     stages {
@@ -162,27 +177,15 @@ pipeline {
         // 📧 Send Email Notification
         // --------------------------------------------------------------------
         stage('Send Email Notification') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
             steps {
-                emailext(
-                    subject: "✅ Build Complete: ${env.PROJECT_NAME} - ${env.NEW_VERSION}",
-                    body: """
-                        Hello Team,
+                echo "📧 Sending SUCCESS email via Gmail SMTP (587)..."
 
-                        The build completed successfully 🎉
-
-                        Project     : ${env.PROJECT_NAME}
-                        Environment : ${params.ENVIRONMENT}
-                        Version     : ${env.NEW_VERSION}
-
-                        Download installer ZIP:
-                        ${BUILD_URL}artifact/result/installer.zip
-
-                        Regards,
-                        Jenkins CI/CD
-                        """,
-                    attachmentsPattern: 'result/*.zip',
-                    to: "${env.NOTIFY_EMAIL}"
-                )
+                bat """
+                python send_installer_email.py
+                """
             }
         }
     }
