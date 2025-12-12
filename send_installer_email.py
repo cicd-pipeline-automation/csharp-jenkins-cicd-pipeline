@@ -40,4 +40,4 @@ with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
     server.login(SMTP_USERNAME, SMTP_PASSWORD)
     server.send_message(msg)
 
-print("✅ Email sent successfully (link-only, Gmail safe)")
+print("Email sent successfully (link-only, Gmail safe)")
